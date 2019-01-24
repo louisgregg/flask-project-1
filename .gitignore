@@ -1,3 +1,7 @@
+#ignore 
 flask-1-env/
 *.mp3
+*.ini
 
+#allow
+!sample_config.ini
