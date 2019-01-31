@@ -34,9 +34,9 @@ def index():
 def about():
     return render_template('about.html')
 
-@app.route('/login')
-def login():
-    return render_template('login.html')
+# @app.route('/login')
+# def login():
+#     return render_template('login.html')
 
 @app.route('/music')
 def music():
@@ -84,7 +84,61 @@ def register():
 		return redirect(url_for('login'))
 	return render_template('register.html', form=form)
 
+# User login
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    if request.method == 'POST':
+        # Get Form Fields
+        username = request.form['username']
+        password_candidate = request.form['password']
+
+        #create cursor
+        cur = mysql.connection.cursor()
+
+        # Get user by Username
+        result = cur.execute("SELECT * FROM users WHERE username = %s", [username])
+
+        if result > 0:
+            #Get stored hash
+            data = cur.fetchone()
+            password = data['password']
+
+            #compare passwords
+            if sha256_crypt.verify(password_candidate, password):
+                #if  correct password
+                session['logged_in'] = True
+                session['username'] = username
+
+                flash('You are now logged in', 'success')
+                return redirect(url_for('dashboard'))
+
+            else :
+                #if password incorrect
+                app.logger.info('Valid username. Invalid Password.')
+                error = 'Invalid Login'
+                return render_template('login.html', error=error)
+
+        else : #username not found
+            app.logger.info('No User')
+            error = 'Username not found'
+            return render_template('login.html', error=error)
+        cur.close()
+    return render_template('login.html')
+
+# Logout
+@app.route('/logout')
+def logout():
+    session.clear()
+    flash('You are now logged out', 'success')
+    return redirect(url_for('login'))
+
+
+
+# Dashboard
+@app.route('/dashboard')
+def dashboard():
+    return render_template('dashboard.html')
 if __name__ == '__main__':
-    
+
 	app.secret_key=imported_config['DEFAULT']['session_secretkey']
 	app.run(debug=True)
