@@ -1,4 +1,5 @@
 import os
+import sys
 def make_tree(path):
     tree = dict(name=os.path.basename(path), children=[])
     try: lst = os.listdir(path)
@@ -12,3 +13,7 @@ def make_tree(path):
             else:
                 tree['children'].append(dict(name=name))
     return tree
+
+
+if __name__ == '__main__':
+    print(make_tree(sys.argv[1]))

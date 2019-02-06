@@ -1,8 +1,10 @@
 {%extends 'layout.html'%}
 
 {%block body%}
-  <title>Path: {{ tree.name }}</title>
-  <h1>{{ tree.name }}</h1>
+  <!-- <title>Path: {{ tree.name }}</title> -->
+  <!-- <h1>{{ tree.name }}</h1> -->
+  <h1>Shitty Music App</h1>
+  <p class="lead">This page hosts music files intended to highlight my refined and eclectic taste. Stream at will.</p>
   <ul>
   {% for item in tree.children recursive %}
     <li>{{ item.name }}

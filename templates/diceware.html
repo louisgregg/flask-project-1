@@ -1,0 +1,39 @@
+{%extends 'layout.html'%}
+
+{%block body%}
+<h1>Evil Passphrase Generator</h1>
+  {%from "includes/_formhelpers.html" import render_field %}
+  <form method="POST" action="">
+    <div class="form-group">
+      {{render_field(form.book, class_="form-control")}}
+    </div>
+    <div class="form-group">
+      {{render_field(form.n_words, class_="form-control")}}
+    </div>
+    <p><input type="submit" class="btn btn-primary" value="Submit"></p>
+  </form>
+
+<h2>Previously Generated Passphrases and the People Who Use Them</h2>
+<table class="table table-striped">
+  <thead>
+  <tr>
+    <th> IP </th>
+    <th> Passphrase </th>
+    <th> Timestamp </th>
+    <th> User-Agent </th>
+    <th> Book Used </th>
+  </tr>
+  </thead>
+  <tbody>
+  {% for passphrase_tuple in dict_of_tuples %}
+  <tr>
+    <td> {{ passphrase_tuple.ip_address }} </td>
+    <td> {{ passphrase_tuple.generated_password }} </td>
+    <td> {{ passphrase_tuple.date_created }} </td>
+    <td> {{ passphrase_tuple.browser_info }} </td>
+    <td> {{ passphrase_tuple.book }} </td>
+  </tr>
+  {% endfor %}
+  </tbody>
+</table>
+{% endblock %}
