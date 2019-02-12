@@ -35,10 +35,6 @@ def index():
 # def about():
 #     return render_template('about.html')
 
-# @app.route('/login')
-# def login():
-#     return render_template('login.html')
-
 @app.route('/music')
 def music():
     # Route for the music page
@@ -49,96 +45,96 @@ def music():
 def media_send(path):
     return send_from_directory('media', path)
 
-class RegisterForm(Form):
-	name = StringField('Name', [validators.Length(min=1,max=50)])
-	email = StringField('Email', [validators.DataRequired(), validators.Length(min=6, max=50), validators.Email(message='Please enter a valid email.')])
-	username= StringField('Username', [validators.DataRequired(), validators.Length(min=4,max=25)])
-	password = PasswordField('Password', [validators.DataRequired(), validators.EqualTo('confirm', message='Passwords do not match.')])
-	confirm = PasswordField('Comfirm Password',[validators.DataRequired()])
-
-@app.route('/register', methods=['GET', 'POST'] )
-def register():
-	form = RegisterForm(request.form)
-	if request.method == 'POST' and form.validate():
-		# Do stuff if post request is made
-		name=form.name.data
-		email=form.email.data
-		username=form.username.data
-		"""
-		THe password variable being filled below is in fact the concatination of a salt generated once and the hash of this salt with the password supplied by the user. This hash string is pushed to the MySQL DB.
-		I changed this to sha256_crypt.hash from sha256_crypt.encrypt as it was deprecated.
-		"""
-		password=sha256_crypt.hash(str(form.password.data))
-
-		# Create cursor
-		cur = mysql.connection.cursor()
-
-		# Execute query
-		cur.execute("INSERT INTO users(name, email, username, password) VALUES(%s, %s, %s, %s)", (name, email, username, password))
-
-		# Commit to DB
-		mysql.connection.commit()
-
-		# Close connection
-		cur.close()
-
-		flash('You are now registered and can log in', 'success')
-
-		return redirect(url_for('login'))
-	return render_template('register.html', form=form)
-
-# User login
-@app.route('/login', methods=['GET', 'POST'])
-def login():
-    if request.method == 'POST':
-        # Get Form Fields
-        username = request.form['username']
-        password_candidate = request.form['password']
-
-        #create cursor
-        cur = mysql.connection.cursor()
-
-        # Get user by Username
-        result = cur.execute("SELECT * FROM users WHERE username = %s", [username])
-
-        if result > 0:
-            #Get stored hash
-            data = cur.fetchone()
-            password = data['password']
-
-            #compare passwords
-            if sha256_crypt.verify(password_candidate, password):
-                #if  correct password
-                session['logged_in'] = True
-                session['username'] = username
-
-                flash('You are now logged in', 'success')
-                return redirect(url_for('dashboard'))
-
-            else :
-                #if password incorrect
-                app.logger.info('Valid username. Invalid Password.')
-                error = 'Invalid Login'
-                return render_template('login.html', error=error)
-
-        else : #username not found
-            app.logger.info('No User')
-            error = 'Username not found'
-            return render_template('login.html', error=error)
-        cur.close()
-    return render_template('login.html')
-
-# Logout
-@app.route('/logout')
-def logout():
-    session.clear()
-    flash('You are now logged out', 'success')
-    return redirect(url_for('login'))
-
-# Dashboard
-@app.route('/dashboard')
-def dashboard():
-    return render_template('dashboard.html')
+# class RegisterForm(Form):
+# 	name = StringField('Name', [validators.Length(min=1,max=50)])
+# 	email = StringField('Email', [validators.DataRequired(), validators.Length(min=6, max=50), validators.Email(message='Please enter a valid email.')])
+# 	username= StringField('Username', [validators.DataRequired(), validators.Length(min=4,max=25)])
+# 	password = PasswordField('Password', [validators.DataRequired(), validators.EqualTo('confirm', message='Passwords do not match.')])
+# 	confirm = PasswordField('Comfirm Password',[validators.DataRequired()])
+#
+# @app.route('/register', methods=['GET', 'POST'] )
+# def register():
+# 	form = RegisterForm(request.form)
+# 	if request.method == 'POST' and form.validate():
+# 		# Do stuff if post request is made
+# 		name=form.name.data
+# 		email=form.email.data
+# 		username=form.username.data
+# 		"""
+# 		THe password variable being filled below is in fact the concatination of a salt generated once and the hash of this salt with the password supplied by the user. This hash string is pushed to the MySQL DB.
+# 		I changed this to sha256_crypt.hash from sha256_crypt.encrypt as it was deprecated.
+# 		"""
+# 		password=sha256_crypt.hash(str(form.password.data))
+#
+# 		# Create cursor
+# 		cur = mysql.connection.cursor()
+#
+# 		# Execute query
+# 		cur.execute("INSERT INTO users(name, email, username, password) VALUES(%s, %s, %s, %s)", (name, email, username, password))
+#
+# 		# Commit to DB
+# 		mysql.connection.commit()
+#
+# 		# Close connection
+# 		cur.close()
+#
+# 		flash('You are now registered and can log in', 'success')
+#
+# 		return redirect(url_for('login'))
+# 	return render_template('register.html', form=form)
+#
+# # User login
+# @app.route('/login', methods=['GET', 'POST'])
+# def login():
+#     if request.method == 'POST':
+#         # Get Form Fields
+#         username = request.form['username']
+#         password_candidate = request.form['password']
+#
+#         #create cursor
+#         cur = mysql.connection.cursor()
+#
+#         # Get user by Username
+#         result = cur.execute("SELECT * FROM users WHERE username = %s", [username])
+#
+#         if result > 0:
+#             #Get stored hash
+#             data = cur.fetchone()
+#             password = data['password']
+#
+#             #compare passwords
+#             if sha256_crypt.verify(password_candidate, password):
+#                 #if  correct password
+#                 session['logged_in'] = True
+#                 session['username'] = username
+#
+#                 flash('You are now logged in', 'success')
+#                 return redirect(url_for('dashboard'))
+#
+#             else :
+#                 #if password incorrect
+#                 app.logger.info('Valid username. Invalid Password.')
+#                 error = 'Invalid Login'
+#                 return render_template('login.html', error=error)
+#
+#         else : #username not found
+#             app.logger.info('No User')
+#             error = 'Username not found'
+#             return render_template('login.html', error=error)
+#         cur.close()
+#     return render_template('login.html')
+#
+# # Logout
+# @app.route('/logout')
+# def logout():
+#     session.clear()
+#     flash('You are now logged out', 'success')
+#     return redirect(url_for('login'))
+#
+# # Dashboard
+# @app.route('/dashboard')
+# def dashboard():
+#     return render_template('dashboard.html')
 
 # Produce a dict of previously generated passwords to display in each web page
 def retrieve_generated_passwords(n_passwords):
