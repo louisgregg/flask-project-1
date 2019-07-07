@@ -13,12 +13,12 @@
 !make_tree.py
 
 #ignore all mp3 files within media folder (but include folder itself)
-!media/
-media/*.mp3
+!media/*
+**/*.mp3
 #ignore all jpg files within media folder (but include folder itself)
-!photos/
-photos/*.jpg
-photos/*.jpeg
+!photos/*
+**/*.jpg
+**/*.jpeg
 
 !project_start.sh
 !pseudo_diceware.py
@@ -27,10 +27,10 @@ photos/*.jpeg
 !regex_wrapper_test.py
 !requirements.txt
 !sample_config.ini
-!sentiment_images/
+!sentiment_images/*
 !sha256test.py
 !table_extract_test.py
 !tables_create.sql
-!templates/
-!wordlists/
+!templates/*
+!wordlists/*
 
