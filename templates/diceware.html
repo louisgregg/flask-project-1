@@ -2,6 +2,9 @@
 
 {%block body%}
 <h1>Evil Passphrase Generator</h1>
+<p class="lead">
+  This is a dicewave password generator that I actively do <b>not</b> recommend that you use ... so that makes it an art project I guess? Passwords and IP addresses are stored by an <b>evil MySQL database on the backend</b>. Instead, I encourage you to download, test and use the random word generator on my <a href="https://github.com/louisgregg/pseudo-diceware">Github</a>. 
+</p>
   {%from "includes/_formhelpers.html" import render_field %}
   <form method="POST" action="">
     <div class="form-group">

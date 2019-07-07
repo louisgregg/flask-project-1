@@ -1,12 +1,20 @@
 #!/usr/bin/python
+
+
+### Attempt to fix encoding issue from  https://stackoverflow.com/questions/10561923/unicodedecodeerror-ascii-codec-cant-decode-byte-0xef-in-position-1
+# -*- coding: utf-8 -*
 import sys
+#reload(sys)
+#sys.setdefaultencoding('utf-8')
+
+
 import random
 import re
 """
 Some code snippits taken from:
 https://stackoverflow.com/questions/6255641/counting-the-number-of-unique-words-in-a-document-with-python
 
-Dicts are implemented as hash tables and are theremore orders of magnitude faster than lists (i.e. arrays) for lookups. 
+Dicts are implemented as hash tables and are therefore are orders of magnitude faster than lists (i.e. arrays) for lookups. 
  See here:
 https://stackoverflow.com/questions/38927794/python-dictionary-vs-list-which-is-faster/38927968
  ---> Will use the dict method below instead of a list.
@@ -19,7 +27,7 @@ https://docs.python.org/2/library/random.html
 """
 def string_cleaner(path_to_book):
 	# exclude characters are not in a-z A-Z
-	clean_string=re.sub('[^a-zA-Z ]',' ', open(path_to_book).read())
+	clean_string=re.sub('[^a-zA-Z ]',' ', open(path_to_book, encoding='utf8').read())
 	# convert to lower case
 	clean_string = clean_string.lower()
 	# condense all whitespace and tabs to single spaces. 

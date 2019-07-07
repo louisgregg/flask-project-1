@@ -3,8 +3,10 @@
 {%block body%}
   <!-- <title>Path: {{ tree.name }}</title> -->
   <!-- <h1>{{ tree.name }}</h1> -->
-  <h1>Shitty Music App</h1>
-  <p class="lead">This page hosts music files intended to highlight my refined and eclectic taste. Stream at will.</p>
+  <h1>Simple Music App</h1>
+  <p class="lead">This page hosts music files intended to highlight my refined and eclectic taste. 
+  At the moment I've scheduled a cron job to scrape / repost my buddy's podcast every day (for fun).
+  Check them out on <a href="https://soundcloud.com/oddned/tracks">Soundcloud</a>.</p>
   <ul>
   {% for item in tree.children recursive %}
     <li>{{ item.name }}
@@ -13,7 +15,7 @@
     {% endif %}</li>
     {% if item.name.endswith('.mp3') %}
      <audio controls preload="metadata" style=" width:300px;">
-       <source src= "media/{{item.name}}" type="audio/mpeg">
+	     <source src= "media/{{ item.name }}" type="audio/mpeg">
        Your browser does not support the audio element.
      </audio><br />
      {% endif %}

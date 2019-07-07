@@ -1,15 +1,41 @@
+#!/home/f/fi/fin/public_html/flasky/venv_3/bin/python3
 from flask import Flask, render_template,  send_from_directory, flash, redirect, url_for, session, logging, request
-from make_tree import make_tree # For file trees in a tuple
+from flask_project_1.make_tree import make_tree # For file trees in a tuple
 from flask_mysqldb import MySQL
 from wtforms import Form, StringField, SelectField, IntegerField, TextAreaField, PasswordField, validators
 from passlib.hash import sha256_crypt
 import configparser
-import pseudo_diceware
-from make_glob_list import make_glob # for listing out files in a folder to pass to WT Forms. REQUIRES PYTHON3
+import flask_project_1.pseudo_diceware as p_d
+from flask_project_1.make_glob_list import make_glob # for listing out files in a folder to pass to WT Forms. REQUIRES PYTHON3
 import re
 # Import variables from the config file.
 imported_config = configparser.ConfigParser()
-imported_config.read(("flaskapp-config-1.ini"))
+imported_config.read(("/home/f/fi/fin/public_html/flasky/flask_project_1/flaskapp-config-1.ini"))
+
+#import logging
+#logging.basicConfig(filename='error.log',level=logging.DEBUG)
+
+#logger = logging.getLogger('werkzeug')
+#handler = logging.FileHandler('access.log')
+#logger.addHandler(handler)
+
+# Also add the handler to Flask's logger for cases
+#  where Werkzeug isn't used as the underlying WSGI server.
+#app.logger.addHandler(handler)
+
+# from flask import Flask, render_template,  send_from_directory, flash, redirect, url_for, session, logging, request
+# from make_tree import make_tree # For file trees in a tuple
+# from flask_mysqldb import MySQL
+# from wtforms import Form, StringField, SelectField, IntegerField, TextAreaField, PasswordField, validators
+# from passlib.hash import sha256_crypt
+# import configparser
+# import pseudo_diceware
+# from make_glob_list import make_glob # for listing out files in a folder to pass to WT Forms. REQUIRES PYTHON3
+# import re
+# # Import variables from the config file.
+# imported_config = configparser.ConfigParser()
+# imported_config.read(("flaskapp-config-1.ini"))
+
 
 
 app =Flask(__name__)
@@ -25,6 +51,8 @@ app.config['MYSQL_CURSORCLASS'] = imported_config['DEFAULT']['MYSQL_CURSORCLASS'
 #Initialize MYSQL
 mysql=MySQL(app)
 
+#Initialize secret key for session
+app.secret_key=imported_config['DEFAULT']['session_secretkey']
 
 @app.route('/')
 def index():
@@ -38,12 +66,12 @@ def index():
 @app.route('/music')
 def music():
     # Route for the music page
-    music_list = make_tree("./media")
+    music_list = make_tree("/home/f/fi/fin/public_html/flasky/flask_project_1/media")
     return render_template('music.html', tree = music_list)
 
-@app.route('/media/<string:path>')
+@app.route("/media/<string:path>")
 def media_send(path):
-    return send_from_directory('media', path)
+    return send_from_directory("media", path)
 
 # class RegisterForm(Form):
 # 	name = StringField('Name', [validators.Length(min=1,max=50)])
@@ -164,7 +192,7 @@ make_glob_list_to_wtforms_tuple = wtform_tuple_creator(make_glob)
 
 # diceware page
 class diceware_form(Form):
-    book = SelectField('Book', choices = make_glob_list_to_wtforms_tuple('./wordlists','txt')) # where choices is a list of value/label pairs
+    book = SelectField('Book', choices = make_glob_list_to_wtforms_tuple('/home/f/fi/fin/public_html/flasky/flask_project_1//wordlists','txt')) # where choices is a list of value/label pairs
     n_words = IntegerField('Number of Words',[validators.DataRequired(), validators.NumberRange(min=1, max=20, message='Please enter an integer between 1 and 20.')], default=7)
 
 @app.route('/diceware', methods=['GET', 'POST'])
@@ -175,12 +203,12 @@ def diceware():
         # Do stuff if post request is made
         book_path = form.book.data
         n_words = form.n_words.data
-        diceware_passphrase = " ".join(pseudo_diceware.main(book_path, n_words))
+        diceware_passphrase = " ".join(p_d.main(book_path, n_words))
         flash(diceware_passphrase, 'success')
 
         client_ip = request.environ['REMOTE_ADDR']
         user_agent = request.user_agent.string
-        book_used = form.book.data
+        book_used = filename = re.search('[^\/]*\.'+'txt',form.book.data).group(0)
         # Create cursor
         cur = mysql.connection.cursor()
         # Execute query
@@ -198,6 +226,21 @@ def diceware():
     #app.logger.info(dict_of_passphrase_tuples)
     return render_template('diceware.html', form=form, dict_of_tuples=dict_of_passphrase_tuples)
 
+@app.route('/nlp')
+def nlp():
+    # Route for the music page
+    image_list = make_tree("/home/f/fi/fin/public_html/flasky/flask_project_1/sentiment_images")
+    return render_template('twint_nlp.html', tree = image_list)    
+
+@app.route('/sentiment_images/<string:path>')
+def sentiment_images_send(path):
+    return send_from_directory("sentiment_images", path)
+
+@app.route('/photos/<string:path>')
+def photos_send(path):
+    return send_from_directory("photos", path)    
+
+
 @app.route('/password_list')
 def password_list():
     ####
@@ -206,8 +249,19 @@ def password_list():
     dict_of_passphrase_tuples = retrieve_generated_passwords(100)
     app.logger.info(dict_of_passphrase_tuples)
     return render_template('password_list.html', dict_of_tuples=dict_of_passphrase_tuples)
+
+@app.route('/contact')
+def contact():
+    return render_template('contact.html') 
+
+@app.route('/uploaded_files/<string:path>')
+def key_send(path):
+    return send_from_directory("uploaded_files", path)       
+
 # Initialization at runtime from command line
 if __name__ == '__main__':
-
-	app.secret_key=imported_config['DEFAULT']['session_secretkey']
-	app.run(debug=True)
+    app.secret_key=imported_config['DEFAULT']['session_secretkey']
+    #import logging
+    #logging.basicConfig(filename='error.log',level=logging.DEBUG)
+    
+    app.run()
